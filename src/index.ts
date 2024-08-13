@@ -17,7 +17,9 @@ dotenv.config()
 
 const app = express()
 const PORT = 3000
-app.use(cors()) // Enable CORS for all routes
+app.use(cors({
+    origin: 'https://solana-client.vercel.app' // Ganti dengan domain yang diizinkan
+})) // Enable CORS for all routes
 app.use(express.json())
 app.use('/auth', authRouter)
 app.use('/profile', profileRouter)
