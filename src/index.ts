@@ -9,7 +9,9 @@ import resultRouter from './routes/result'
 import uploadRouter from './routes/upload'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import { injectSpeedInsights } from '@vercel/speed-insights';
 
+injectSpeedInsights();
 dotenv.config()
 
 
