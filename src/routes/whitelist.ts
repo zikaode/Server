@@ -166,18 +166,9 @@ router.post('/',
                 where: { AND: { userId: userData.id, electionId: id } }
             })
 
-            const electionWhitelist = await prisma.whitelists.findFirst({
-                where: { AND: { address: address, electionId: id } }
-            })
-
             if (userWhitelist) {
                 return res.status(200).json({ message: 'Kamu Telah Masuk Dalam Whitelist' })
             }
-
-            if (electionWhitelist) {
-                return res.status(400).json({ errors: [{ msg: 'Address Ini Telah Masuk Pada Daftar Whitelist Pemilihan Ini.. Gunakan Wallet Lainnya!' }] })
-            }
-
             const userProfile = await prisma.profile.findFirst({
                 where: { userId: userData.id }
             })
