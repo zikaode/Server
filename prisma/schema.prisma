@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                String       @id @default(uuid())
+  name              String
+  email             String       @unique
+  access            Access
+  password          String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  isEmailValidate   Boolean      @default(false)
+  isTerminate       Boolean      @default(false)
+  verificationToken String?      @unique
+  candidateKetua    Candidate[]  @relation("Ketua")
+  candidateWakil    Candidate[]  @relation("Wakil")
+  Exception         Exception?
+  profile           Profile?
+  whitelist         Whitelists[]
+  saksi             Election[]   @relation("saksi")
+}
+
+model Profile {
+  id             String   @id @default(uuid())
+  prodi          Prodi
+  jurusan        Jurusan
+  address        String?
+  addressHistory String?
+  publicKey      String?
+  image          String?
+  imageKTM       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  userId         String   @unique
+  nim            String   @unique
+  user           Users    @relation(fields: [userId], references: [id])
+}
+
+model Election {
+  id             String         @id @default(uuid())
+  name           String
+  whitelistStart DateTime?
+  whitelistEnd   DateTime?
+  voteStart      DateTime?
+  voteEnd        DateTime?
+  organization   String
+  description    String?
+  winner         String?
+  Status         StatusElection
+  publicKey      String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  candidate      Candidate[]
+  exception      Exception[]
+  whitelists     Whitelists[]
+  saksi          Users[]        @relation("saksi")
+}
+
+model Whitelists {
+  id         String          @id @default(uuid())
+  address    String
+  email      String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  userId     String
+  electionId String
+  status     StatusWhitelist
+  ballot     Ballot?
+  election   Election        @relation(fields: [electionId], references: [id])
+  user       Users           @relation(fields: [userId], references: [id])
+}
+
+model Candidate {
+  id           String   @id @default(uuid())
+  ketuaId      String
+  wakilId      String
+  electionId   String
+  balloutCount Int
+  election     Election @relation(fields: [electionId], references: [id])
+  ketua        Users    @relation("Ketua", fields: [ketuaId], references: [id])
+  wakil        Users    @relation("Wakil", fields: [wakilId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
+
+model Ballot {
+  id          String     @id @default(uuid())
+  voteId      String
+  isvalid     Boolean    @default(true)
+  transaction String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  whitelistId String     @unique
+  whitelist   Whitelists @relation(fields: [whitelistId], references: [id])
+}
+
+model Exception {
+  id         String   @id @default(uuid())
+  note       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  saksiId    String   @unique
+  electionId String
+  election   Election @relation(fields: [electionId], references: [id])
+  user       Users    @relation(fields: [saksiId], references: [id])
+}
+
+enum Access {
+  ADMIN
+  USER
+  CANDIDATE
+  SAKSI
+}
+
+enum StatusElection {
+  DRAFT
+  ONGOING
+  FINISH
+  TERMINATE
+}
+
+enum StatusWhitelist {
+  ACCEPT
+  DECLINE
+  PENDING
+}
+
+enum Prodi {
+  REKAYASA_MULTIMEDIA
+  TEKNOLOGI_KOMPUTER_JARINGAN
+  TEKNIK_INFORMATIKA
+  AKUTANSI
+  ADMINISTRASI_BISNIS
+  KEUANGAN_SEKTOR_PULIK
+  LEMBAGA_KEUANGAN_SYARIAH
+  LISTRIK
+  TELEKOMUNIKASI
+  ELEKTRONIKA
+  REKAYASA_PEMBANGKIT_LISTRIK
+  REKAYASA_JARINGAN_TELEKOMUNIKASI
+  REKAYASA_INSTRUMEN_DAN_KONTROL
+  TEKNOLOGI_INDUSTRI
+  TEKNOLOGI_MESIN
+  REKAYASA_MANUFAKTURING
+  REKAYASA_PENGELASAN_DAN_FABRIKASI
+  TEKNOLOGI_KIMIA
+  TEKNOLOGI_PENGOLAHAN_MINYAK_DAN_GAS
+  REKAYASA_KIMIA_INDUSTRI
+  KONSTRUKSI_BANGUNAN_AIR
+  KONSTRUKSI_JALAN_JEMBATAN
+  KONSTRUKSI_BANGUNAN_GEDUNG
+  REKAYASA_KONSTRUKSI_JALAN_JEMBATAN
+}
+
+enum Jurusan {
+  SIPIL
+  KIMIA
+  ELEKTRO
+  TATA_NIAGA
+  MESIN
+  TIK
+}
