@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import { param, body, validationResult } from 'express-validator'
 import { PrismaClient } from '@prisma/client'
+import { profile } from 'console'
 
 const router = express.Router()
 const prisma = new PrismaClient()
@@ -94,12 +95,13 @@ router.get('/finished/:electionId', [
                 }
             }
         })
+
         const ballot = await prisma.ballot.findMany({
             where: {
                 whitelist: {
-                    electionId: electionId
+                    electionId: electionId,
                 }
-            }
+            }, include: { whitelist: { include: { user: { select: { name: true, profile: { select: { publicKey: true } } } } } } }
         })
 
         if (!election) {
@@ -145,6 +147,7 @@ router.get('/finished/:electionId', [
                 name: saksi.name,
                 email: saksi.email
             })),
+            ballot: ballot,
             totalWhitelists,
             totalVoters
         }
