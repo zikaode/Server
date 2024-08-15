@@ -83,8 +83,8 @@ router.get('/finished/:electionId', [
                     select: {
                         id: true,
                         balloutCount: true,
-                        ketua: true,
-                        wakil: true
+                        ketua: { include: { profile: true } },
+                        wakil: { include: { profile: true } }
                     }
                 },
                 saksi: true,
