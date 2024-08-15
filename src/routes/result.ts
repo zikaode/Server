@@ -149,6 +149,7 @@ router.get('/finished/:electionId', [
                 email: saksi.email
             })),
             ballot: ballot,
+            whitelists: election.whitelists,
             totalWhitelists,
             totalVoters
         }
