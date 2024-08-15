@@ -93,7 +93,7 @@ router.get('/finished/:electionId', [
                         id: true, status: true, ballot: true
                     },
                 }
-            }
+            },
         })
 
         const ballot = await prisma.ballot.findMany({
@@ -135,6 +135,7 @@ router.get('/finished/:electionId', [
             id: election.id,
             name: election.name,
             status: election.Status,
+            publicKey: election.publicKey,
             winner,
             candidates: election.candidate.map(candidate => ({
                 id: candidate.id,
